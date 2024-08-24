@@ -2,7 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"twitter-feed/internal/database"
@@ -10,14 +9,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
 )
 
 func Run() {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		log.Fatal(err)
-	}
 	port := os.Getenv("SERVER_PORT")
 
 	DB := database.NewPostgresConnection()
@@ -31,6 +25,6 @@ func Run() {
 	router.Get("/", messageHandler.GetMessage)
 	router.Post("/", messageHandler.CreateMessage)
 
-	fmt.Printf("Server started at port %s", port)
+	fmt.Printf("Server started at port %s\n", port)
 	http.ListenAndServe(":"+port, router)
 }
