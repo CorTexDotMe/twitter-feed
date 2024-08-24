@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
+	"time"
 	"twitter-feed/internal/model"
 
 	"gorm.io/driver/postgres"
@@ -12,22 +12,23 @@ import (
 )
 
 func NewPostgresConnection() *gorm.DB {
-	port, err := strconv.Atoi(os.Getenv("DB_PORT"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	connectionProperties := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%s user=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
-		port,
-		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_USER"),
 		os.Getenv("DB_NAME"))
 
-	db, err := gorm.Open(postgres.Open(connectionProperties), &gorm.Config{})
-	if err != nil {
-		log.Fatal(err)
+	var db *gorm.DB
+	var err error
+	for {
+		db, err = gorm.Open(postgres.Open(connectionProperties), &gorm.Config{})
+		if err == nil {
+			break
+		}
+
+		log.Printf("Connection failed(%s); will retry...", err.Error())
+		time.Sleep(5 * time.Second)
 	}
 
 	db.AutoMigrate(&model.Message{})
