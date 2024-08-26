@@ -1,10 +1,14 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
 	"twitter-feed/internal/model"
 
+	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
@@ -13,15 +17,50 @@ type MessageHandler struct {
 }
 
 func (m *MessageHandler) GetMessage(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("New message")
+	w.Write([]byte("Message"))
 }
 
 func (m *MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	var message model.Message
+
 	err := json.NewDecoder(r.Body).Decode(&message)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if message.Username == "" || message.Message == "" {
+		http.Error(w, "Fields username and message are mandatory", http.StatusBadRequest)
+		return
+	}
+
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	key := []byte(fmt.Sprintf("address-%s", r.RemoteAddr))
+
+	err = pushToKafka(key, messageBytes, r.Context())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	json.NewEncoder(w).Encode("Message added")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("Message added"))
+}
+
+func pushToKafka(key []byte, message []byte, context context.Context) error {
+	url := os.Getenv("KAFKA_URL")
+	topic := os.Getenv("KAFKA_TOPIC")
+	writer := &kafka.Writer{
+		Addr:     kafka.TCP(url),
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
+	}
+
+	msg := kafka.Message{
+		Key:   key,
+		Value: message,
+	}
+
+	return writer.WriteMessages(context, msg)
 }
