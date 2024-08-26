@@ -77,6 +77,7 @@ services:
       context: .
       dockerfile: cmd/server/Dockerfile
     networks:
+      - servernet
       - roachnet
       - kafkanet
     ports:
@@ -109,6 +110,16 @@ services:
       KAFKA_GROUP: "message-group"
       KAFKA_TOPIC: "messages"
 
+  message-bot:
+    build:
+      context: .
+      dockerfile: cmd/message-bot/Dockerfile
+    networks:
+      - servernet
+    environment:
+      SERVER_URL: "http://server:8888/"
+      SENDING_TIMEOUT_SECONDS: 25
+
 volumes:
   kafka:
   roach1:
@@ -120,4 +131,6 @@ networks:
   roachnet:
     driver: bridge
   kafkanet:
+    driver: bridge
+  servernet:
     driver: bridge

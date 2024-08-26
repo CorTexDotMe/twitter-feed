@@ -3,6 +3,7 @@ module twitter-feed
 go 1.21.5
 
 require (
+	github.com/UltiRequiem/lorelai v1.0.0
 	github.com/go-chi/chi/v5 v5.1.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11

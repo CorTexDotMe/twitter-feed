@@ -1,3 +1,5 @@
+github.com/UltiRequiem/lorelai v1.0.0 h1:69nhFq2E/i4v5EN1qL4L9tQUgWKDZeusggMAV5XpbhE=
+github.com/UltiRequiem/lorelai v1.0.0/go.mod h1:WMMC/G8UDxDcQMoy7BCU7V5oQQAyIvThmnli/dHbI5E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
