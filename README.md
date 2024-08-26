@@ -6,10 +6,14 @@ Uses docker-compose and Go
 
 Project starts with one command (bash file) without installing anything except docker
 
+``` bash
+./start.sh
+```
+
 ## Functionality
 
 - Endpoint to add message
 - Endpoint to get feed (get existing messages and stream new ones - use HTTP streaming)
 - Implemented back pressure for message creation with Kafka
-- Uses Cockroachdb with 2-node cluster
-- Implemented a bot to generate messages. Configurable speed at .env
+- Uses Cockroachdb with 3-node cluster
+- Implemented a bot to generate messages. Configurable speed at docker-compose.yml
