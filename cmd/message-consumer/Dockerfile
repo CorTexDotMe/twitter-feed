@@ -1,4 +1,4 @@
-FROM golang:1.23.0-alpine
+FROM golang:1.23.0-alpine3.20 as build
 
 WORKDIR /app
 
@@ -7,6 +7,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /cmd/message-consumer ./cmd/message-consumer/main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -o /message-consumer ./cmd/message-consumer/main.go
 
-CMD ["/cmd/message-consumer"]
+FROM scratch
+
+COPY --from=build /message-consumer /message-consumer
+
+ENTRYPOINT ["/message-consumer"]
