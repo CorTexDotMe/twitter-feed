@@ -7,6 +7,6 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /cmd/twitterfeed/main ./cmd/twitterfeed/main.go
+RUN go build -o /cmd/server ./cmd/server/main.go
 
-CMD ["/cmd/twitterfeed/main"]
+CMD ["/cmd/server"]
