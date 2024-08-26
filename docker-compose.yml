@@ -1,4 +1,20 @@
 services:
+  kafka:
+    restart: always
+    image: bitnami/kafka:3.3
+    networks:
+      - kafkanet
+    volumes:
+      - "kafka:/bitnami/kafka"
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
   roach1:
     image: cockroachdb/cockroach:v22.2.19
     hostname: roach1
@@ -56,11 +72,13 @@ services:
     volumes:
       - "roach3:/cockroach/cockroach-data"
 
-  app:
+  server:
     build:
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: cmd/server/Dockerfile
     networks:
       - roachnet
+      - kafkanet
     ports:
       - "8888:8888"
     environment:
@@ -69,8 +87,30 @@ services:
       DB_PORT: 26257
       DB_USER: root
       DB_NAME: twitterdb
+      KAFKA_URL: kafka:9092
+      KAFKA_GROUP: message-group
+      KAFKA_TOPIC: messages
+
+  message-consumer:
+    restart: always
+    build:
+      context: .
+      dockerfile: cmd/message-consumer/Dockerfile
+    networks:
+      - roachnet
+      - kafkanet
+    environment:
+      SERVER_PORT: 8888
+      DB_HOST: "roach1"
+      DB_PORT: 26257
+      DB_USER: root
+      DB_NAME: twitterdb
+      KAFKA_URL: kafka:9092
+      KAFKA_GROUP: message-group
+      KAFKA_TOPIC: messages
 
 volumes:
+  kafka:
   roach1:
   roach2:
   roach3:
@@ -78,4 +118,6 @@ volumes:
 
 networks:
   roachnet:
+    driver: bridge
+  kafkanet:
     driver: bridge
