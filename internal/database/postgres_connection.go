@@ -23,15 +23,21 @@ func NewPostgresConnection() *gorm.DB {
 	var err error
 	for {
 		db, err = gorm.Open(postgres.Open(connectionProperties), &gorm.Config{})
-		if err == nil {
-			break
+		if err != nil {
+			log.Printf("Connection failed(%s); will retry...", err.Error())
+			time.Sleep(5 * time.Second)
+			continue
 		}
 
-		log.Printf("Connection failed(%s); will retry...", err.Error())
-		time.Sleep(5 * time.Second)
-	}
+		err = db.AutoMigrate(&model.Message{})
+		if err != nil {
+			log.Printf("Failed to perfom migration(%s); will retry...", err.Error())
+			time.Sleep(5 * time.Second)
+			continue
+		}
 
-	db.AutoMigrate(&model.Message{})
+		break
+	}
 
 	return db
 }
