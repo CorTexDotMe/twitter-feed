@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 	"twitter-feed/internal/model"
 
 	"github.com/segmentio/kafka-go"
@@ -17,7 +18,31 @@ type MessageHandler struct {
 }
 
 func (m *MessageHandler) GetMessage(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Message"))
+	flusher := w.(http.Flusher)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Connection", "keep-alive")
+
+	var messages []*model.Message
+	err := m.DB.Find(&messages).Error
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	for _, v := range messages {
+		json.NewEncoder(w).Encode(v)
+		flusher.Flush()
+	}
+
+	for {
+		_, err := w.Write([]byte("Message"))
+		if err != nil {
+			break
+		}
+		flusher.Flush()
+
+		time.Sleep(5 * time.Second)
+	}
 }
 
 func (m *MessageHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
