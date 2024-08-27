@@ -1,7 +1,7 @@
 services:
   kafka:
     restart: always
-    image: bitnami/kafka:3.3
+    image: bitnami/kafka:3.7
     networks:
       - kafkanet
     volumes:

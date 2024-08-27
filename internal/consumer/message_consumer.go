@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
+	"time"
 	"twitter-feed/internal/database"
 	"twitter-feed/internal/model"
 
@@ -18,12 +18,13 @@ func PullFromKafka() {
 	url := os.Getenv("KAFKA_URL")
 	groupId := os.Getenv("KAFKA_GROUP")
 	topic := os.Getenv("KAFKA_TOPIC")
+
+	sendInitMessage(url, groupId, topic)
+
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{url},
-		GroupID:  groupId,
-		Topic:    topic,
-		MinBytes: 10e3,
-		MaxBytes: 10e6,
+		Brokers: []string{url},
+		GroupID: groupId,
+		Topic:   topic,
 	})
 	defer reader.Close()
 
@@ -31,17 +32,48 @@ func PullFromKafka() {
 	for {
 		msg, err := reader.ReadMessage(context.Background())
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			break
 		}
 
 		feedMessage := model.Message{}
 		err = json.Unmarshal(msg.Value, &feedMessage)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println(err)
+			continue
 		}
 		db.Create(&feedMessage)
 
 		fmt.Printf("Message created with id: %d\n", feedMessage.ID)
 	}
 
+}
+
+func sendInitMessage(url string, groupId string, topic string) {
+	reader := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: []string{url},
+		GroupID: groupId,
+		Topic:   topic,
+	})
+	defer reader.Close()
+
+	writer := &kafka.Writer{
+		Addr:     kafka.TCP(url),
+		Topic:    topic,
+		Balancer: &kafka.LeastBytes{},
+	}
+
+	msg := kafka.Message{
+		Key:   []byte("init-key"),
+		Value: []byte("init-message"),
+	}
+
+	for {
+		err := writer.WriteMessages(context.Background(), msg)
+		if err == nil {
+			break
+		}
+		fmt.Println(err)
+		time.Sleep(10 * time.Second)
+	}
 }
