@@ -101,7 +101,6 @@ services:
       - roachnet
       - kafkanet
     environment:
-      SERVER_PORT: 8888
       DB_HOST: "roach1"
       DB_PORT: 26257
       DB_USER: "root"
@@ -109,6 +108,8 @@ services:
       KAFKA_URL: "kafka:9092"
       KAFKA_GROUP: "message-group"
       KAFKA_TOPIC: "messages"
+    depends_on:
+      - kafka
 
   message-bot:
     build:
@@ -118,7 +119,9 @@ services:
       - servernet
     environment:
       SERVER_URL: "http://server:8888/"
-      SENDING_TIMEOUT_SECONDS: 25
+      SENDING_TIMEOUT_SECONDS: 15
+    depends_on:
+      - server
 
 volumes:
   kafka:
