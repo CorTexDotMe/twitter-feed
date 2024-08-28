@@ -40,13 +40,21 @@ To configure message-bot speed change SENDING_TIMEOUT_SECONDS environmental vari
 - Method: "GET"
 - Response: All existing messages in the form of separate JSON objects and new ones as soon as they are added. It uses the HTTP streaming concept to establish a connection and send the data
 
-#### Add message feed
+#### Add message
 
 - Default URL: "<http://localhost:8888/>"
 - Method: "POST"
 - Request Body: A JSON object with the message details.
-  - "username" (String): name of the user who sent the message
-  - "message" (String): the message itself
+  - "username" (String): name of the user who sent the message
+  - "message" (String): the message itself
+
+##### Message feed testing
+
+Utilities like cURL can help with testing how streaming works.
+
+```powershell
+curl.exe --no-buffer -v "http://localhost:8888/"
+```
 
 ## License
 
