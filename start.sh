@@ -13,3 +13,5 @@ do
 done
 
 echo "Database 'twitterdb' has been created successfully(if not existed)"
+
+docker-compose exec roach1 ./cockroach sql --insecure --host=roach2:26258 --execute="SET CLUSTER SETTING kv.rangefeed.enabled = true;"
