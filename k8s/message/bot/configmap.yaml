@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: message-bot-config
+data:
+  SERVER_URL: "http://message-server.default.svc.cluster.local"
+  SENDING_TIMEOUT_SECONDS: "15"

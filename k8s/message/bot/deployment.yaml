@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-bot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: message-bot
+  template:
+    metadata:
+      labels:
+        app: message-bot
+    spec:
+      containers:
+      - name: message-bot
+        image: message-bot:latest
+        imagePullPolicy: Never
+        envFrom:
+        - configMapRef:
+            name: message-bot-config
