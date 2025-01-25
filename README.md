@@ -10,13 +10,20 @@ Uses docker-compose and Go
 - add nginx load balancer
 - better logger
 - move server to gin
+- create db when none exist
 
 ## Run
 
-The project starts with one command (bash file) without installing anything except docker
+The project starts locally with one command (bash file) without installing anything except docker
 
 ``` bash
 ./start.sh
+```
+
+To start with minikube
+
+```bash
+/start.kube.sh 
 ```
 
 ## Functionality
