@@ -10,7 +10,6 @@ Uses docker-compose and Go
 - add nginx load balancer
 - better logger
 - move server to gin
-- create db when none exist
 
 ## Run
 

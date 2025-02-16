@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"twitter-feed/internal/database"
@@ -14,7 +15,11 @@ import (
 func Run() {
 	port := os.Getenv("SERVER_PORT")
 
-	DB := database.NewPostgresConnection()
+	postgres := database.NewPostgresDB()
+	DB, err := postgres.NewDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 	messageHandler := handler.MessageHandler{DB: DB}
 
 	router := chi.NewRouter()
