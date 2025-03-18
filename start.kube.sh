@@ -1,5 +1,3 @@
-eval $(minikube docker-env)
-
 minikube start --cpus 10 --memory 6144
 minikube addons enable metrics-server
 
