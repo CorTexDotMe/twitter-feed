@@ -2,12 +2,27 @@
 
 Uses docker-compose and Go
 
+## TODO
+
+- One dockerfile. Build script with different tags for different commands
+- Move to k8s(minikube)
+- .env for docker compose run
+- add nginx load balancer
+- better logger
+- move server to gin
+
 ## Run
 
-The project starts with one command (bash file) without installing anything except docker
+The project starts locally with one command (bash file) without installing anything except docker
 
 ``` bash
 ./start.sh
+```
+
+To start with minikube
+
+```bash
+/start.kube.sh 
 ```
 
 ## Functionality

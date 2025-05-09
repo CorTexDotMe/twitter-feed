@@ -75,7 +75,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: cmd/server/Dockerfile
+      dockerfile: cmd/message-server/Dockerfile
     networks:
       - servernet
       - roachnet

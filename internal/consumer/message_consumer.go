@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"time"
 	"twitter-feed/internal/database"
@@ -13,7 +14,11 @@ import (
 )
 
 func PullFromKafka() {
-	db := database.NewPostgresConnection()
+	postgres := database.NewPostgresDB()
+	db, err := postgres.NewDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	url := os.Getenv("KAFKA_URL")
 	groupId := os.Getenv("KAFKA_GROUP")

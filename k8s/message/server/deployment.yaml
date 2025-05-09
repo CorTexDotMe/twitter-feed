@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: message-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: message-server
+  template:
+    metadata:
+      labels:
+        app: message-server
+    spec:
+      containers:
+      - name: message-server
+        image: message-server:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8888 # informational
+        envFrom:
+        - configMapRef:
+            name: message-server-config
